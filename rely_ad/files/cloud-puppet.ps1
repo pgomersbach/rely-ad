@@ -1,5 +1,12 @@
 #ps1
 
+# Usage:
+# <powershell>
+# Set-ExecutionPolicy Unrestricted -Force
+# icm $executioncontext.InvokeCommand.NewScriptBlock((New-Object Net.WebClient).DownloadString('https://rely-ad.googlecode.com/git/rely_ad/files/cloud-puppet.ps1')) -ArgumentList ("rely_ad")
+#</powershell>
+
+
   param(
 #    [string]$role = (throw "-role is required."),
     [string]$role = "rely_ad"
