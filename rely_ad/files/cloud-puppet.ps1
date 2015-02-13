@@ -14,7 +14,7 @@
   )
 
   $puppet_source = "https://code.google.com/p/rely-ad/"
-  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-latest.msi"
+  $MsiUrl = "https://downloads.puppetlabs.com/windows/puppet-3.7.4-x64.msi"
 
   $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
   if (! ($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))) {
