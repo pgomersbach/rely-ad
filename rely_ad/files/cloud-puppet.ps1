@@ -9,7 +9,7 @@
 
   param(
 #    [string]$role = (throw "-role is required."),
-    [string]$role = "rely_ad"
+    [string]$role = "rely_ad",
     [string]$rabbithost = "localhost"
   )
 
