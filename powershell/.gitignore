@@ -1,0 +1,25 @@
+## MAC OS
+.DS_Store
+
+## TEXTMATE
+*.tmproj
+tmtags
+
+## EMACS
+*~
+\#*
+.\#*
+
+## VIM
+*.swp
+tags
+
+.rspec
+.*.sw[op]
+.bundle/
+Gemfile.lock
+Gemfile.local
+
+## IntelliJ / Rubymine
+.idea
+*.iml
