@@ -30,9 +30,9 @@ class rely_ad (
 
   # set hostname
   if $myhostname != $::hostname {
-    notify { "hostname change required": }
+    notify { "hostname change required, from $::hostname to $myhostname": }
     exec {  'change_hostname':
-      command   => "wmic computersystem where name=\"$::fqdn\" call rename name=\"$myhostname\"",
+      command   => "wmic computersystem where name=\"$::hostname\" call rename name=\"$myhostname\"",
       path      => $::path,
       notify    => Reboot['after_run'],
     }
