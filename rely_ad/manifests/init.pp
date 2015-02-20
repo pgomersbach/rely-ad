@@ -34,7 +34,7 @@ class rely_ad (
     exec {  'change_hostname':
       command   => "wmic computersystem where name=\"$::hostname\" call rename name=\"$myhostname\"",
       path      => $::path,
-#      notify    => Reboot['after_run'],
+      notify    => Reboot['after_run'],
     }
   }
 
