@@ -21,7 +21,7 @@ class rely_ad (
     exec {  'change_hostname':
       command   => "wmic computersystem where name=\"$::fqdn\" call rename name=\"$myhostname\"",
       path      => $::path,
-  #    unless    => 'cmd.exe /c net user administrator | find "Password" | find "expires" | findstr "Never"' 
+      notify    => Reboot['after_run'],
     }
   }
 
@@ -29,7 +29,7 @@ class rely_ad (
   class {'windows_ad':
     install                => present,
     installmanagementtools => true,
-    restart                => true,
+    restart                => false,
     installflag            => true,
     configure              => present,
     configureflag          => true,
@@ -46,6 +46,11 @@ class rely_ad (
     dsrmpassword           => $dsrmpassword,
     installdns             => 'yes',
     localadminpassword     => $localadminpassword,
+    notify                 => Reboot['after_run'],
+  }
+
+  reboot { 'after_run':
+    apply  => finished,
   }
 # activate ad recyclebin
 # ptr enable
