@@ -45,6 +45,8 @@
     Write-Host "Git installer failed."
     Exit 1
   }
+
+  Write-Host "Git successfully installed."
  
   if (Test-Path "${Env:ProgramFiles(x86)}\Git\bin\git.exe") {
     $clone_args = @("clone",$puppet_source,"C:\ProgramData\PuppetLabs\puppet\etc\modules" )
@@ -55,6 +57,8 @@
       Exit 1
     }
   }
+
+  Write-Host "Repo successfully cloned."
 
   if ($rabbithost) {
     Set-Item -path env:FACTER_rabbithost -value $rabbithost
