@@ -14,6 +14,13 @@ class rely_ad (
 # set search domain
 # register nic connection in dns
 # use this connects sufix in dns registration
+
+  exec {  'enable_dnsregistration':
+    command   => '$NICs = Get-WMIObject Win32_NetworkAdapterConfiguration | where{$_.IPEnabled -eq "TRUE"} Foreach($NIC in $NICs) { $NIC.SetDynamicDNSRegistration("TRUE")',
+    path      => $::path,
+    provider  => powershell,
+  }
+
 # disable ipv6
   class {'windows_disable_ipv6':
     ipv6_disable => true,
