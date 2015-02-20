@@ -19,7 +19,7 @@ class rely_ad (
   if $myhostname != $::hostname {
     notify { "hostname change required": }
     exec {  'change_hostname':
-      command   => "wmic computersystem where name=\"$::fqdn\" call rename name=\"$myhostname\",
+      command   => "wmic computersystem where name=\"$::fqdn\" call rename name=\"$myhostname\"",
       path      => $::path,
   #    unless    => 'cmd.exe /c net user administrator | find "Password" | find "expires" | findstr "Never"' 
     }
