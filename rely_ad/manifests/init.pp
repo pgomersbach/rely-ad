@@ -1,5 +1,5 @@
 class rely_ad (
-  $myhostname='testserver',
+  $myhostname='mytestserver',
   $domain='forest',
   $domainname='jre.local',
   $netbiosdomainname='jre',
