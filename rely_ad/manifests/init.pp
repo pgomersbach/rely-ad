@@ -15,6 +15,12 @@ class rely_ad (
 # register nic connection in dns
 # use this connects sufix in dns registration
 # disable ipv6
+  class {'windows_disable_ipv6':
+    ipv6_disable => true,
+    ipv6_reboot  => false,
+    notify       => Reboot['after_run'],
+  }
+
   # set hostname
   if $myhostname != $::hostname {
     notify { "hostname change required": }
