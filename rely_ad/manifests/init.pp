@@ -17,12 +17,12 @@ class rely_ad (
 # use this connects sufix in dns registration
 
   exec {  'enable_dnsregistration':
-    command   => '$NICs = Get-WMIObject Win32_NetworkAdapterConfiguration | where{$_.IPEnabled -eq "TRUE"} Foreach($NIC in $NICs) { $NIC.SetDynamicDNSRegistration("TRUE")',
-    path      => $::path,
-    provider  => powershell,
+    command  => '$NICs = Get-WMIObject Win32_NetworkAdapterConfiguration | where{$_.IPEnabled -eq "TRUE"} Foreach($NIC in $NICs) { $NIC.SetDynamicDNSRegistration("TRUE")',
+    path     => $::path,
+    provider => powershell,
   }
 
-# disable ipv6
+  # disable ipv6
   class {'windows_disable_ipv6':
     ipv6_disable => true,
     ipv6_reboot  => false,
@@ -31,22 +31,18 @@ class rely_ad (
 
   # set hostname
   dsc_xcomputer {'change_hostname':
-    dsc_ensure       => 'present',
-    dsc_name         => "$myhostname",
+    dsc_ensure => 'present',
+    dsc_name   => $myhostname,
   }
 
-#  dsc_windowsfeature {'IIS':
-#    dsc_ensure => 'present',
-#    dsc_name   => 'Web-Server',
-#  }
-#  if $myhostname != $::hostname {
-#    notify { "hostname change required, from $::hostname to $myhostname": }
-#    exec {  'change_hostname':
-#      command   => "wmic computersystem where name=\"$::hostname\" call rename name=\"$myhostname\"",
-#      path      => $::path,
-#      notify    => Reboot['after_run'],
-#    }
-#  }
+  if $myhostname != $::hostname {
+    notify { "hostname change required, from ${::hostname} to ${myhostname}": }
+    exec {  'change_hostname':
+      command => "wmic computersystem where name=\"${::hostname}\" call rename name=\"${myhostname}\"",
+      path    => $::path,
+      notify  => Reboot['after_run'],
+    }
+  }
 
   # install ad
   class {'windows_ad':
