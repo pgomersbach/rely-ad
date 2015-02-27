@@ -30,15 +30,15 @@ class rely_ad (
   }
 
   # set hostname
-#  dsc_xcomputer {'change_hostname':
-#    dsc_ensure       => 'present',
-#    dsc_name         => "$myhostname",
-#  }
-
-  dsc_windowsfeature {'IIS':
-    dsc_ensure => 'present',
-    dsc_name   => 'Web-Server',
+  dsc_xcomputer {'change_hostname':
+    dsc_ensure       => 'present',
+    dsc_name         => "$myhostname",
   }
+
+#  dsc_windowsfeature {'IIS':
+#    dsc_ensure => 'present',
+#    dsc_name   => 'Web-Server',
+#  }
 #  if $myhostname != $::hostname {
 #    notify { "hostname change required, from $::hostname to $myhostname": }
 #    exec {  'change_hostname':
