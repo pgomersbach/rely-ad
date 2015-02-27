@@ -10,7 +10,6 @@ class rely_ad (
   $localadminpassword='12_Changeme',
 ){
 
-include dsc
 # wrapper class
 
 # set search domain
