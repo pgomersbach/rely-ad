@@ -29,14 +29,18 @@ class rely_ad (
   }
 
   # set hostname
-  if $myhostname != $::hostname {
-    notify { "hostname change required, from $::hostname to $myhostname": }
-    exec {  'change_hostname':
-      command   => "wmic computersystem where name=\"$::hostname\" call rename name=\"$myhostname\"",
-      path      => $::path,
-      notify    => Reboot['after_run'],
-    }
+  dsc_xcomputer {'change_hostname':
+    dsc_ensure       => 'present',
+    dsc_name         => "$myhostname",
   }
+#  if $myhostname != $::hostname {
+#    notify { "hostname change required, from $::hostname to $myhostname": }
+#    exec {  'change_hostname':
+#      command   => "wmic computersystem where name=\"$::hostname\" call rename name=\"$myhostname\"",
+#      path      => $::path,
+#      notify    => Reboot['after_run'],
+#    }
+#  }
 
   # install ad
   class {'windows_ad':
