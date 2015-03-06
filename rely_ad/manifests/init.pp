@@ -23,7 +23,7 @@ class rely_ad (
   exec {  'enable_dnsregistration':
     command  => '(Get-WmiObject Win32_NetworkAdapter -Filter "NetEnabled=True").GetRelated(\'Win32_NetworkAdapterConfiguration\').SetDynamicDNSRegistration($true,$false)',
     path     => $::path,
-    onlyif   => '(Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object {$_.IPEnabled -eq "True"}).FullDNSRegistrationEnabled',
+    onlyif   => 'if ((Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object {$_.IPEnabled -eq "True"}).FullDNSRegistrationEnabled) { exit 1 }',
     provider => powershell,
   }
 
