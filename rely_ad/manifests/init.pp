@@ -15,13 +15,9 @@ class rely_ad (
 # set search domain
 # register nic connection in dns
 # use this connects sufix in dns registration
-# unset:
-# (Get-WmiObject Win32_NetworkAdapter -Filter "NetEnabled=True").GetRelated('Win32_NetworkAdapterConfiguration').SetDynamicDNSRegistration($false,$false)
-# check:
-# (Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object {$_.IPEnabled -eq "True"}).FullDNSRegistrationEnabled
 
   exec {  'enable_dnsregistration':
-    command  => '(Get-WmiObject Win32_NetworkAdapter -Filter "NetEnabled=True").GetRelated(\'Win32_NetworkAdapterConfiguration\').SetDynamicDNSRegistration($true,$false)',
+    command  => '(Get-WmiObject Win32_NetworkAdapter -Filter "NetEnabled=True").GetRelated(\'Win32_NetworkAdapterConfiguration\').SetDynamicDNSRegistration($true,$true)',
     path     => $::path,
     onlyif   => 'if ((Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object {$_.IPEnabled -eq "True"}).FullDNSRegistrationEnabled) { exit 1 }',
     provider => powershell,
