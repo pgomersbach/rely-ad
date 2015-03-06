@@ -17,8 +17,14 @@ class rely_ad (
 # activate ad recyclebin (check forest level => 4
 # Enable-ADOptionalFeature -Identity 'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=vkernel,DC=local' -Scope ForestOrConfigurationSet -Target 'vkernel.local'
 
+  $namearray = split($domainname, '.')
   if  $forestlevel >= '4' {
-    notify { "forestlevel $forestlevel detected, enable recycle bin": }
+    notify { "forestlevel $forestlevel detected, enable recycle bin, name0 $namearray[0]": }
+    exec {  'enable_ad_ recyclebin':
+      command  => "Enable-ADOptionalFeature -Identity 'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=vkernel,DC=local' -Scope ForestOrConfigurationSet -Target \'$domainname\'",
+      path     => $::path,
+      provider => powershell,
+    }
   }
 
   # register nic connection in dns and use this connect suffix in dns registration
