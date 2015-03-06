@@ -13,9 +13,15 @@ class rely_ad (
 # wrapper class
 
 # set search domain
-# register nic connection in dns
-# use this connects sufix in dns registration
+# ptr enable
+# activate ad recyclebin (check forest level => 4
+# Enable-ADOptionalFeature -Identity 'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=vkernel,DC=local' -Scope ForestOrConfigurationSet -Target 'vkernel.local'
 
+  if  $forestlevel => '4' {
+    notify { "forestleven $forestlevel detected, enable recycle bin": }
+  }
+
+  # register nic connection in dns and use this connect suffix in dns registration
   exec {  'enable_dnsregistration':
     command  => '(Get-WmiObject Win32_NetworkAdapter -Filter "NetEnabled=True").GetRelated(\'Win32_NetworkAdapterConfiguration\').SetDynamicDNSRegistration($true,$true)',
     path     => $::path,
@@ -30,6 +36,7 @@ class rely_ad (
     notify       => Reboot['after_run'],
   }
 
+  # change hostname
   if $myhostname != $::hostname {
     notify { "hostname change required, from ${::hostname} to ${myhostname}": }
     exec {  'change_hostname':
@@ -66,6 +73,4 @@ class rely_ad (
   reboot { 'after_run':
     apply  => finished,
   }
-# activate ad recyclebin
-# ptr enable
 }
