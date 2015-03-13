@@ -20,14 +20,12 @@ class rely_ad (
     $array_var = split($domainname, '[.]')
     $domfirst = $array_var[0]
     $domsec = $array_var[1]
-    notify { "Enable-ADOptionalFeature -Identity \'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=$domfirst,DC=$domsec\' -Scope ForestOrConfigurationSet -Target \'$domainname\' -Confirm:\$false": }
     notify { "forestlevel $forestlevel detected, enable recycle bin for $domfirst $domsec": }
-
-#    exec {  'enable_ad_ recyclebin':
-#      command  => "Enable-ADOptionalFeature -Identity 'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=vkernel,DC=local' -Scope ForestOrConfigurationSet -Target \'$domainname\'",
-#      path     => $::path,
-#      provider => powershell,
-#    }
+    exec {  'enable_ad_ recyclebin':
+      command  => "Enable-ADOptionalFeature -Identity \'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=$domfirst,DC=$domsec\' -Scope ForestOrConfigurationSet -Target \'$domainname\' -Confirm:\$false",
+      path     => $::path,
+      provider => powershell,
+    }
   }
 
   # register nic connection in dns and use this connect suffix in dns registration
