@@ -20,7 +20,7 @@ class rely_ad (
   $namearray = split($domainname, '.')
   if  $forestlevel >= '4' {
 $string     =  $domainname
-$array_var1 = split($string, ':')
+$array_var1 = split($string, '.')
 #    notify { "forestlevel $forestlevel detected, enable recycle bin, $namearray": }
     notify { "$array_var1": }
 #    exec {  'enable_ad_ recyclebin':
