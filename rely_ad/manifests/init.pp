@@ -15,15 +15,20 @@ class rely_ad (
 # set search domain
 # ptr enable
   $masklen = netmask_to_masklen($::netmask)
-  notify { $masklen: }
+  notify {  "Add-DnsServerPrimaryZone -NetworkID \"$::ipaddress\/$masklen\" -ReplicationScope \"Forest\"": }
 
+#  exec {  'create_ptr':
+#    command  => "Add-DnsServerPrimaryZone -NetworkID \"$::ipaddress\/$masklen\" -ReplicationScope \"Forest\"",
+#    path     => $::path,
+#    unless   => 'Get-ADOptionalFeature -filter * | findstr Recycle',
+#    provider => powershell,
+#  }
 
   # activate ad recyclebin (check forest level => 4
   if  $forestlevel >= '4' {
     $array_var = split($domainname, '[.]')
     $domfirst = $array_var[0]
     $domsec = $array_var[1]
-    notify { "forestlevel $forestlevel detected, enable recycle bin for $domfirst $domsec": }
     exec {  'enable_ad_ recyclebin':
       command  => "Enable-ADOptionalFeature -Identity \'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=$domfirst,DC=$domsec\' -Scope ForestOrConfigurationSet -Target \'$domainname\' -Confirm:\$false",
       path     => $::path,
