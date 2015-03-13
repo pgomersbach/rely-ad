@@ -19,9 +19,10 @@ class rely_ad (
 
   $namearray = split($domainname, '[.]')
   if  $forestlevel >= '4' {
-$array_var = split($domainname, '[.]')
-$domfirst = $array_var[0]
-$domsec = $array_var[1]
+    $array_var = split($domainname, '[.]')
+    $domfirst = $array_var[0]
+    $domsec = $array_var[1]
+     notify { "Enable-ADOptionalFeature -Identity 'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=vkernel,DC=local' -Scope ForestOrConfigurationSet -Target \'$domainname\'": }
     notify { "forestlevel $forestlevel detected, enable recycle bin for $domfirst $domsec": }
 
 #    exec {  'enable_ad_ recyclebin':
