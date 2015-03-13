@@ -24,7 +24,7 @@ class rely_ad (
     exec {  'enable_ad_ recyclebin':
       command  => "Enable-ADOptionalFeature -Identity \'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=$domfirst,DC=$domsec\' -Scope ForestOrConfigurationSet -Target \'$domainname\' -Confirm:\$false",
       path     => $::path,
-      onlyif   => 'Get-ADOptionalFeature -filter * | findstr Recycle',
+      unless   => 'Get-ADOptionalFeature -filter * | findstr Recycle',
       provider => powershell,
     }
   }
