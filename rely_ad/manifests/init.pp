@@ -22,7 +22,7 @@ class rely_ad (
 $string     =  $domainname
 $array_var1 = split($string, ':')
 #    notify { "forestlevel $forestlevel detected, enable recycle bin, $namearray": }
-    notify { "$string": }
+    notify { "$array_var1": }
 #    exec {  'enable_ad_ recyclebin':
 #      command  => "Enable-ADOptionalFeature -Identity 'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=vkernel,DC=local' -Scope ForestOrConfigurationSet -Target \'$domainname\'",
 #      path     => $::path,
