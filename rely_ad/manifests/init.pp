@@ -14,8 +14,8 @@ class rely_ad (
 
 # set search domain
 # ptr enable
-# activate ad recyclebin (check forest level => 4
 
+  # activate ad recyclebin (check forest level => 4
   if  $forestlevel >= '4' {
     $array_var = split($domainname, '[.]')
     $domfirst = $array_var[0]
