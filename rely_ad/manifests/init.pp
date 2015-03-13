@@ -15,7 +15,7 @@ class rely_ad (
 # set search domain
 # ptr enable
   $masklen = netmask_to_masklen($::netmask)
-  notify {  "Add-DnsServerPrimaryZone -NetworkID \"$::ipaddress\/$masklen\" -ReplicationScope \"Forest\"": }
+  notify {  "Add-DnsServerPrimaryZone -NetworkID \"$::ipaddress/$masklen\" -ReplicationScope \"Forest\"": }
 
 #  exec {  'create_ptr':
 #    command  => "Add-DnsServerPrimaryZone -NetworkID \"$::ipaddress\/$masklen\" -ReplicationScope \"Forest\"",
