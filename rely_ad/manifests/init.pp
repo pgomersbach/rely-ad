@@ -14,6 +14,9 @@ class rely_ad (
 
 # set search domain
 # ptr enable
+  $masklen = netmask_to_masklen($::netmask)
+  notify { $masklen: }
+
 
   # activate ad recyclebin (check forest level => 4
   if  $forestlevel >= '4' {
