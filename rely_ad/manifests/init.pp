@@ -60,6 +60,7 @@ class rely_ad (
       command => "wmic computersystem where name=\"${::hostname}\" call rename name=\"${myhostname}\"",
       path    => $::path,
       notify  => Reboot['after_run'],
+      before  => Class ['windows_ad'],
     }
   }
 
@@ -85,7 +86,6 @@ class rely_ad (
     installdns             => 'yes',
     localadminpassword     => $localadminpassword,
     notify                 => Reboot['after_run'],
-    require                => Exec['change_hostname'],
   }
 
   reboot { 'after_run':
