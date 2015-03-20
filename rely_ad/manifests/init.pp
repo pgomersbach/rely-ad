@@ -18,7 +18,7 @@ class rely_ad (
       command => "wmic computersystem where name=\"${::hostname}\" call rename name=\"${myhostname}\"",
       path    => $::path,
       notify  => Reboot['after_run'],
-      before  => Class ['windows_ad'],
+      after   => Class ['windows_ad'],
     }
   }
 
