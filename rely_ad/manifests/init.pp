@@ -15,7 +15,7 @@ class rely_ad (
 # set search domain
 # ptr enable
   $masklen = netmask_to_masklen($::netmask)
-  notify {  "Add-DnsServerPrimaryZone -NetworkID \"$::ipaddress/$masklen\" -ReplicationScope \"Forest\"": }
+#  notify {  "Add-DnsServerPrimaryZone -NetworkID \"$::ipaddress/$masklen\" -ReplicationScope \"Forest\"": }
 
 #  exec {  'create_ptr':
 #    command  => "Add-DnsServerPrimaryZone -NetworkID \"$::ipaddress\/$masklen\" -ReplicationScope \"Forest\"",
@@ -50,7 +50,7 @@ class rely_ad (
   class {'windows_disable_ipv6':
     ipv6_disable => true,
     ipv6_reboot  => false,
-    notify       => Reboot['after_run'],
+#    notify       => Reboot['after_run'],
   }
 
   # change hostname
@@ -85,6 +85,7 @@ class rely_ad (
     installdns             => 'yes',
     localadminpassword     => $localadminpassword,
     notify                 => Reboot['after_run'],
+    require                => Exec['change_hostname'],
   }
 
   reboot { 'after_run':
