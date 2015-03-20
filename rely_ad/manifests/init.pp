@@ -9,7 +9,6 @@ class rely_ad (
   $dsrmpassword='12_Changeme',
   $localadminpassword='12_Changeme',
 ){
-# wrapper class
 
   # change hostname
   if $myhostname != $::hostname {
@@ -18,7 +17,7 @@ class rely_ad (
       command => "wmic computersystem where name=\"${::hostname}\" call rename name=\"${myhostname}\"",
       path    => $::path,
       notify  => Reboot['after_run'],
-      require  => Class ['windows_ad'],
+      require => Class ['windows_ad'],
     }
   }
 
@@ -26,7 +25,6 @@ class rely_ad (
   class {'windows_disable_ipv6':
     ipv6_disable => true,
     ipv6_reboot  => false,
-#    notify       => Reboot['after_run'],
   }
 
   # register nic connection in dns and use this connect suffix in dns registration
@@ -73,18 +71,15 @@ class rely_ad (
     notify                 => Reboot['after_run'],
   }
 
-  # activate ad recyclebin (check forest level => 4
-  if  $forestlevel >= '4' {
-    $array_var = split($domainname, '[.]')
-    $domfirst = $array_var[0]
-    $domsec = $array_var[1]
-    exec {  'enable_ad_ recyclebin':
-      command  => "Enable-ADOptionalFeature -Identity \'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=$domfirst,DC=$domsec\' -Scope ForestOrConfigurationSet -Target \'$domainname\' -Confirm:\$false",
-      path     => $::path,
-      unless   => 'Get-ADOptionalFeature -filter * | findstr Recycle',
-      provider => powershell,
-      require  => Class[ 'windows_ad' ],
-    }
+  $array_var = split($domainname, '[.]')
+  $domfirst = $array_var[0]
+  $domsec = $array_var[1]
+  exec {  'enable_ad_ recyclebin':
+    command  => "Enable-ADOptionalFeature -Identity \'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=$domfirst,DC=$domsec\' -Scope ForestOrConfigurationSet -Target \'$domainname\' -Confirm:\$false",
+    path     => $::path,
+    unless   => 'Get-ADOptionalFeature -filter * | findstr Recycle',
+    provider => powershell,
+    require  => Class[ 'windows_ad' ],
   }
 
   reboot { 'after_run':
