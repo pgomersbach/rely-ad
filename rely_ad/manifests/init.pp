@@ -34,6 +34,7 @@ class rely_ad (
       path     => $::path,
       unless   => 'Get-ADOptionalFeature -filter * | findstr Recycle',
       provider => powershell,
+      require  => Class[ 'windows_ad' ],
     }
   }
 
