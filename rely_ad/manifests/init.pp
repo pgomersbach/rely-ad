@@ -9,8 +9,33 @@ class rely_ad (
   $dsrmpassword='12_Changeme',
   $localadminpassword='12_Changeme',
 ){
-
 # wrapper class
+
+  # change hostname
+  if $myhostname != $::hostname {
+    notify { "hostname change required, from ${::hostname} to ${myhostname}": }
+    exec {  'change_hostname':
+      command => "wmic computersystem where name=\"${::hostname}\" call rename name=\"${myhostname}\"",
+      path    => $::path,
+      notify  => Reboot['after_run'],
+      before  => Class ['windows_ad'],
+    }
+  }
+
+  # disable ipv6
+  class {'windows_disable_ipv6':
+    ipv6_disable => true,
+    ipv6_reboot  => false,
+#    notify       => Reboot['after_run'],
+  }
+
+  # register nic connection in dns and use this connect suffix in dns registration
+  exec {  'enable_dnsregistration':
+    command  => '(Get-WmiObject Win32_NetworkAdapter -Filter "NetEnabled=True").GetRelated(\'Win32_NetworkAdapterConfiguration\').SetDynamicDNSRegistration($true,$true)',
+    path     => $::path,
+    onlyif   => 'if ((Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object {$_.IPEnabled -eq "True"}).FullDNSRegistrationEnabled) { exit 1 }',
+    provider => powershell,
+  }
 
 # set search domain
 # ptr enable
@@ -23,46 +48,6 @@ class rely_ad (
 #    unless   => 'Get-ADOptionalFeature -filter * | findstr Recycle',
 #    provider => powershell,
 #  }
-
-  # activate ad recyclebin (check forest level => 4
-  if  $forestlevel >= '4' {
-    $array_var = split($domainname, '[.]')
-    $domfirst = $array_var[0]
-    $domsec = $array_var[1]
-    exec {  'enable_ad_ recyclebin':
-      command  => "Enable-ADOptionalFeature -Identity \'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=$domfirst,DC=$domsec\' -Scope ForestOrConfigurationSet -Target \'$domainname\' -Confirm:\$false",
-      path     => $::path,
-      unless   => 'Get-ADOptionalFeature -filter * | findstr Recycle',
-      provider => powershell,
-      require  => Class[ 'windows_ad' ],
-    }
-  }
-
-  # register nic connection in dns and use this connect suffix in dns registration
-  exec {  'enable_dnsregistration':
-    command  => '(Get-WmiObject Win32_NetworkAdapter -Filter "NetEnabled=True").GetRelated(\'Win32_NetworkAdapterConfiguration\').SetDynamicDNSRegistration($true,$true)',
-    path     => $::path,
-    onlyif   => 'if ((Get-WmiObject Win32_NetworkAdapterConfiguration | Where-Object {$_.IPEnabled -eq "True"}).FullDNSRegistrationEnabled) { exit 1 }',
-    provider => powershell,
-  }
-
-  # disable ipv6
-  class {'windows_disable_ipv6':
-    ipv6_disable => true,
-    ipv6_reboot  => false,
-#    notify       => Reboot['after_run'],
-  }
-
-  # change hostname
-  if $myhostname != $::hostname {
-    notify { "hostname change required, from ${::hostname} to ${myhostname}": }
-    exec {  'change_hostname':
-      command => "wmic computersystem where name=\"${::hostname}\" call rename name=\"${myhostname}\"",
-      path    => $::path,
-      notify  => Reboot['after_run'],
-      before  => Class ['windows_ad'],
-    }
-  }
 
   # install ad
   class {'windows_ad':
@@ -86,6 +71,20 @@ class rely_ad (
     installdns             => 'yes',
     localadminpassword     => $localadminpassword,
     notify                 => Reboot['after_run'],
+  }
+
+  # activate ad recyclebin (check forest level => 4
+  if  $forestlevel >= '4' {
+    $array_var = split($domainname, '[.]')
+    $domfirst = $array_var[0]
+    $domsec = $array_var[1]
+    exec {  'enable_ad_ recyclebin':
+      command  => "Enable-ADOptionalFeature -Identity \'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=$domfirst,DC=$domsec\' -Scope ForestOrConfigurationSet -Target \'$domainname\' -Confirm:\$false",
+      path     => $::path,
+      unless   => 'Get-ADOptionalFeature -filter * | findstr Recycle',
+      provider => powershell,
+      require  => Class[ 'windows_ad' ],
+    }
   }
 
   reboot { 'after_run':
