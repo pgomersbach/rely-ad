@@ -16,7 +16,7 @@ class rely_ad (
     exec {  'change_hostname':
       command => "wmic ComputerSystem where Name=\"${::hostname}\" call Rename Name=\"${myhostname}\"",
       path    => $::path,
-#      before  => Class ['windows_ad'],
+      before  => Class ['windows_ad'],
       notify  => Reboot['after_run'],
     }
   }
@@ -48,28 +48,28 @@ class rely_ad (
 #  }
 
   # install ad
-#  class {'windows_ad':
-#    install                => present,
-#    installmanagementtools => true,
-#    restart                => false,
-#    installflag            => true,
-#    configure              => present,
-#    configureflag          => true,
-#    globalcatalog          => 'yes',
-#    domain                 => $domain,
-#    domainname             => $domainname,
-#    netbiosdomainname      => $netbiosdomainname,
-#    domainlevel            => $domainlevel,
-#    forestlevel            => $forestlevel,
-#    databasepath           => 'c:\\windows\\ntds',
-#    logpath                => 'c:\\windows\\ntds',
-#    sysvolpath             => 'c:\\windows\\sysvol',
-#    installtype            => $installtype,
-#    dsrmpassword           => $dsrmpassword,
-#    installdns             => 'yes',
-#    localadminpassword     => $localadminpassword,
-#    notify                 => Reboot['after_run'],
-#  }
+  class {'windows_ad':
+    install                => present,
+    installmanagementtools => true,
+    restart                => false,
+    installflag            => true,
+    configure              => present,
+    configureflag          => true,
+    globalcatalog          => 'yes',
+    domain                 => $domain,
+    domainname             => $domainname,
+    netbiosdomainname      => $netbiosdomainname,
+    domainlevel            => $domainlevel,
+    forestlevel            => $forestlevel,
+    databasepath           => 'c:\\windows\\ntds',
+    logpath                => 'c:\\windows\\ntds',
+    sysvolpath             => 'c:\\windows\\sysvol',
+    installtype            => $installtype,
+    dsrmpassword           => $dsrmpassword,
+    installdns             => 'yes',
+    localadminpassword     => $localadminpassword,
+    notify                 => Reboot['after_run'],
+  }
 
   $array_var = split($domainname, '[.]')
   $domfirst = $array_var[0]
@@ -83,7 +83,6 @@ class rely_ad (
 #  }
 
   reboot { 'after_run':
-    apply   => finished,
-    timeout => 600,
+#    apply   => finished,
   }
 }
