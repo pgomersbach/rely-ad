@@ -82,7 +82,8 @@ class rely_ad (
     require  => Class[ 'windows_ad' ],
   }
 
-  reboot { 'after_run':
-    apply  => finished,
+  reboot { 'after':
+    subscribe       =>  [ Exec[ 'change_hostname'], Class[ 'windows_ad' ]],
   }
+
 }
