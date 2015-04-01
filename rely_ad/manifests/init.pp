@@ -14,10 +14,10 @@ class rely_ad (
   if $myhostname != $::hostname {
     notify { "hostname change required, from ${::hostname} to ${myhostname}": }
     exec {  'change_hostname':
-      command => "wmic computersystem where name=\"${::hostname}\" call rename name=\"${myhostname}\"",
+      command => "wmic ComputerSystem where Name=\"${::hostname}\" call Rename Name=\"${myhostname}\"",
       path    => $::path,
+#      before  => Class ['windows_ad'],
       notify  => Reboot['after_run'],
-      require => Class ['windows_ad'],
     }
   }
 
@@ -48,42 +48,42 @@ class rely_ad (
 #  }
 
   # install ad
-  class {'windows_ad':
-    install                => present,
-    installmanagementtools => true,
-    restart                => false,
-    installflag            => true,
-    configure              => present,
-    configureflag          => true,
-    globalcatalog          => 'yes',
-    domain                 => $domain,
-    domainname             => $domainname,
-    netbiosdomainname      => $netbiosdomainname,
-    domainlevel            => $domainlevel,
-    forestlevel            => $forestlevel,
-    databasepath           => 'c:\\windows\\ntds',
-    logpath                => 'c:\\windows\\ntds',
-    sysvolpath             => 'c:\\windows\\sysvol',
-    installtype            => $installtype,
-    dsrmpassword           => $dsrmpassword,
-    installdns             => 'yes',
-    localadminpassword     => $localadminpassword,
-    notify                 => Reboot['after_run'],
-  }
+#  class {'windows_ad':
+#    install                => present,
+#    installmanagementtools => true,
+#    restart                => false,
+#    installflag            => true,
+#    configure              => present,
+#    configureflag          => true,
+#    globalcatalog          => 'yes',
+#    domain                 => $domain,
+#    domainname             => $domainname,
+#    netbiosdomainname      => $netbiosdomainname,
+#    domainlevel            => $domainlevel,
+#    forestlevel            => $forestlevel,
+#    databasepath           => 'c:\\windows\\ntds',
+#    logpath                => 'c:\\windows\\ntds',
+#    sysvolpath             => 'c:\\windows\\sysvol',
+#    installtype            => $installtype,
+#    dsrmpassword           => $dsrmpassword,
+#    installdns             => 'yes',
+#    localadminpassword     => $localadminpassword,
+#    notify                 => Reboot['after_run'],
+#  }
 
   $array_var = split($domainname, '[.]')
   $domfirst = $array_var[0]
   $domsec = $array_var[1]
-  exec {  'enable_ad_ recyclebin':
-    command  => "Enable-ADOptionalFeature -Identity \'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=$domfirst,DC=$domsec\' -Scope ForestOrConfigurationSet -Target \'$domainname\' -Confirm:\$false",
-    path     => $::path,
-    unless   => 'Get-ADOptionalFeature -filter * | findstr Recycle',
-    provider => powershell,
-    require  => Class[ 'windows_ad' ],
-  }
+#  exec {  'enable_ad_ recyclebin':
+#    command  => "Enable-ADOptionalFeature -Identity \'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=$domfirst,DC=$domsec\' -Scope ForestOrConfigurationSet -Target \'$domainname\' -Confirm:\$false",
+#    path     => $::path,
+#    unless   => 'Get-ADOptionalFeature -filter * | findstr Recycle',
+#    provider => powershell,
+#    require  => Class[ 'windows_ad' ],
+#  }
 
-  reboot { 'after':
-    subscribe       =>  [ Exec[ 'change_hostname'], Class[ 'windows_ad' ]],
+  reboot { 'after_run':
+    apply   => finished,
+    timeout => 600,
   }
-
 }
