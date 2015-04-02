@@ -9,6 +9,12 @@ class rely_ad (
   $dsrmpassword='12_Changeme',
   $localadminpassword='12_Changeme',
 ){
+  # set update policy
+  class { 'windows_autoupdate':
+    noAutoUpdate => '1',
+    aUOptions    => '2',
+  }
+
   # disable EC2Config set hostname 
   file { 'ec2config':
     path               => 'C:\Program Files\Amazon\Ec2ConfigService\Settings\config.xml',
@@ -18,12 +24,12 @@ class rely_ad (
 
   #change hostname
   if $myhostname != $::hostname {
-    notify { "hostname change required, from ${::hostname} to ${myhostname}": }
     exec {  'change_hostname':
       command => "wmic ComputerSystem where Name=\"${::hostname}\" call Rename Name=\"${myhostname}\"",
       path    => $::path,
       before  => Class ['windows_ad'],
       require => File ['ec2config'],
+      notify  => Reboot ['after'],
     }
   }
 
@@ -42,21 +48,11 @@ class rely_ad (
   }
 
 # set search domain
-# ptr enable
-  $masklen = netmask_to_masklen($::netmask)
-#  notify {  "Add-DnsServerPrimaryZone -NetworkID \"$::ipaddress/$masklen\" -ReplicationScope \"Forest\"": }
 
-#  exec {  'create_ptr':
-#    command  => "Add-DnsServerPrimaryZone -NetworkID \"$::ipaddress\/$masklen\" -ReplicationScope \"Forest\"",
-#    path     => $::path,
-#    unless   => 'Get-ADOptionalFeature -filter * | findstr Recycle',
-#    provider => powershell,
-#  }
-
-  # install ad
   reboot { 'before':
-    when => pending,
+    when            => pending,
   }
+  # install ad
   class {'windows_ad':
     install                => present,
     installmanagementtools => true,
@@ -80,6 +76,20 @@ class rely_ad (
     require                => Reboot['before'],
   }
 
+  # create ptr zone
+  $masklen = netmask_to_masklen($::netmask)
+  exec { 'create_ptr_zone':
+    command  => "Add-DnsServerPrimaryZone -NetworkID \"$::network_ethernet/$masklen\" -ReplicationScope \"domain\"",
+    path     => $::path,
+    onlyif   => "Add-DnsServerPrimaryZone -NetworkID \"$::network_ethernet/$masklen\" -ReplicationScope \"domain\"",
+    provider => powershell,
+    require  => Class[ 'windows_ad' ],
+  }
+
+  # create ptr record
+  notify { "Add-DnsServerResourceRecord -Name \"33.167\" -Ptr -ZoneName \"0.10.in-addr.arpa\" -AllowUpdateAny -PtrDomainName \"$::fqdn\"": }
+
+  # enable ad recycle bin
   $array_var = split($domainname, '[.]')
   $domfirst = $array_var[0]
   $domsec = $array_var[1]
@@ -89,5 +99,8 @@ class rely_ad (
     unless   => 'Get-ADOptionalFeature -filter * | findstr Recycle',
     provider => powershell,
     require  => Class[ 'windows_ad' ],
+  }
+
+  reboot { 'after':
   }
 }
