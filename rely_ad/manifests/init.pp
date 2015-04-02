@@ -24,7 +24,6 @@ class rely_ad (
       path    => $::path,
       before  => Class ['windows_ad'],
       require => File ['ec2config'],
-      notify  => Reboot['after_run'],
     }
   }
 
@@ -55,6 +54,9 @@ class rely_ad (
 #  }
 
   # install ad
+  reboot { 'before':
+    when => pending,
+  }
   class {'windows_ad':
     install                => present,
     installmanagementtools => true,
@@ -75,7 +77,7 @@ class rely_ad (
     dsrmpassword           => $dsrmpassword,
     installdns             => 'yes',
     localadminpassword     => $localadminpassword,
-    notify                 => Reboot['after_run'],
+    require                => Reboot['before'],
   }
 
   $array_var = split($domainname, '[.]')
@@ -87,9 +89,5 @@ class rely_ad (
     unless   => 'Get-ADOptionalFeature -filter * | findstr Recycle',
     provider => powershell,
     require  => Class[ 'windows_ad' ],
-  }
-
-  reboot { 'after_run':
-    apply   => finished,
   }
 }
