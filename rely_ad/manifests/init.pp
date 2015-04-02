@@ -9,14 +9,21 @@ class rely_ad (
   $dsrmpassword='12_Changeme',
   $localadminpassword='12_Changeme',
 ){
+  # disable EC2Config set hostname 
+  file { 'ec2config':
+    path               => 'C:\Program Files\Amazon\Ec2ConfigService\Settings\config.xml',
+    source             => 'puppet:///modules/rely_ad/ec2config.xml',
+    source_permissions => ignore,
+  }
 
-  # change hostname
+  #change hostname
   if $myhostname != $::hostname {
     notify { "hostname change required, from ${::hostname} to ${myhostname}": }
     exec {  'change_hostname':
       command => "wmic ComputerSystem where Name=\"${::hostname}\" call Rename Name=\"${myhostname}\"",
       path    => $::path,
       before  => Class ['windows_ad'],
+      require => File ['ec2config'],
       notify  => Reboot['after_run'],
     }
   }
@@ -74,15 +81,15 @@ class rely_ad (
   $array_var = split($domainname, '[.]')
   $domfirst = $array_var[0]
   $domsec = $array_var[1]
-#  exec {  'enable_ad_ recyclebin':
-#    command  => "Enable-ADOptionalFeature -Identity \'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=$domfirst,DC=$domsec\' -Scope ForestOrConfigurationSet -Target \'$domainname\' -Confirm:\$false",
-#    path     => $::path,
-#    unless   => 'Get-ADOptionalFeature -filter * | findstr Recycle',
-#    provider => powershell,
-#    require  => Class[ 'windows_ad' ],
-#  }
+  exec {  'enable_ad_ recyclebin':
+    command  => "Enable-ADOptionalFeature -Identity \'CN=Recycle Bin Feature,CN=Optional Features,CN=Directory Service,CN=Windows NT,CN=Services,CN=Configuration,DC=$domfirst,DC=$domsec\' -Scope ForestOrConfigurationSet -Target \'$domainname\' -Confirm:\$false",
+    path     => $::path,
+    unless   => 'Get-ADOptionalFeature -filter * | findstr Recycle',
+    provider => powershell,
+    require  => Class[ 'windows_ad' ],
+  }
 
   reboot { 'after_run':
-#    apply   => finished,
+    apply   => finished,
   }
 }
