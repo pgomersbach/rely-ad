@@ -9,6 +9,18 @@ class rely_ad (
   $dsrmpassword='12_Changeme',
   $localadminpassword='12_Changeme',
 ){
+  # validata parameters
+  include stdlib
+  validate_string($myhostname)
+  validate_string($domain)
+  validate_string($domainname)
+  validate_string($netbiosdomainname)
+  validate_integer($domainlevel)
+  validate_integer($forestlevel)
+  validate_string($installtype)
+  validate_string($dsrmpassword)
+  validate_string($localadminpassword)
+
   # set update policy
   class { 'windows_autoupdate':
     noAutoUpdate => '1',
@@ -87,7 +99,7 @@ class rely_ad (
   }
 
   # create ptr record
-  notify { "Add-DnsServerResourceRecord -Name \"33.167\" -Ptr -ZoneName \"0.10.in-addr.arpa\" -AllowUpdateAny -PtrDomainName \"$::fqdn\"": }
+#  notify { "Add-DnsServerResourceRecord -Name \"33.167\" -Ptr -ZoneName \"0.10.in-addr.arpa\" -AllowUpdateAny -PtrDomainName \"$::fqdn\"": }
 
   # enable ad recycle bin
   $array_var = split($domainname, '[.]')
@@ -101,6 +113,5 @@ class rely_ad (
     require  => Class[ 'windows_ad' ],
   }
 
-  reboot { 'after':
-  }
+  reboot { 'after': }
 }
